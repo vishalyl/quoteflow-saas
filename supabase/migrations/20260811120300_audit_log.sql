@@ -9,9 +9,14 @@
 -- writes it, and there is no insert/update/delete policy for anyone.
 -- ============================================================================
 
+-- org_id deliberately carries NO foreign key. An audit row is a historical
+-- fact, not a live reference — and with a key, deleting an organisation was
+-- impossible: the cascade delete of its quotations fired this very trigger,
+-- which tried to write a row pointing at the organisation being deleted, and
+-- the key rejected it. Rows are cleaned up by the trigger below instead.
 create table if not exists public.audit_log (
   id             bigint generated always as identity primary key,
-  org_id         uuid not null references public.organisations(id) on delete cascade,
+  org_id         uuid not null,
   table_name     text not null,
   row_id         uuid not null,
   action         text not null check (action in ('insert', 'update', 'delete')),
@@ -35,6 +40,8 @@ language sql
 immutable
 as $$ select array['updated_at', 'updated_by', 'created_at'] $$;
 
+-- The audit trigger must also stay quiet while its organisation is being
+-- deleted, or the cascade re-creates the rows the trigger above just removed.
 create or replace function public.audit_change()
 returns trigger
 language plpgsql
@@ -68,14 +75,18 @@ begin
       end if;
     end loop;
 
-    -- Nothing of substance changed; don't write a row.
     if array_length(v_changed, 1) is null then
       return new;
     end if;
 
-    -- Keep only what moved, so the log stays readable and small.
     v_before := (select jsonb_object_agg(k, v_before -> k) from unnest(v_changed) k);
     v_after  := (select jsonb_object_agg(k, v_after  -> k) from unnest(v_changed) k);
+  end if;
+
+  -- The organisation is gone (or going): nothing to attach this history to.
+  if v_org is null or not exists (select 1 from public.organisations where id = v_org) then
+    if tg_op = 'DELETE' then return old; end if;
+    return new;
   end if;
 
   insert into public.audit_log (org_id, table_name, row_id, action, changed_by, changed_fields, before, after)
@@ -121,6 +132,25 @@ create policy audit_log_select on public.audit_log
   using (org_id = public.current_org_id());
 
 revoke all on public.audit_log from anon;
+
+-- Because there is no foreign key, audit rows are removed explicitly when an
+-- organisation is deleted. BEFORE DELETE, so this runs ahead of the cascade
+-- that would otherwise write fresh audit rows on the way out.
+create or replace function public.purge_audit_for_org()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  delete from public.audit_log where org_id = old.id;
+  return old;
+end $$;
+
+drop trigger if exists purge_audit_for_org_trg on public.organisations;
+create trigger purge_audit_for_org_trg
+  before delete on public.organisations
+  for each row execute function public.purge_audit_for_org();
 
 -- History for one row, newest first — powers the "who changed this?" panel.
 create or replace function public.row_history(p_table text, p_row_id uuid)

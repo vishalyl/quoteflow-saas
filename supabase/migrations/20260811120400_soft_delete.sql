@@ -41,15 +41,37 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------- delete ----
+-- SECURITY DEFINER, with the organisation checked explicitly below.
+--
+-- It cannot be SECURITY INVOKER: the policy above only permits rows that are
+-- NOT deleted, and Postgres applies that condition to the row as it will be
+-- after the update — so setting deleted_at makes the row fail the very policy
+-- that authorises the write. The policy that hides deleted rows would forbid
+-- anything from ever becoming deleted. Restore has the same problem, which is
+-- why it is written the same way.
 create or replace function public.soft_delete(p_table text, p_id uuid)
 returns void
 language plpgsql
-security invoker
+security definer
 set search_path = public, pg_temp
 as $$
+declare
+  v_org     uuid := public.current_org_id();
+  v_row_org uuid;
 begin
   if p_table not in ('quotations', 'companies', 'suppliers', 'master_products') then
     raise exception 'Cannot delete from %', p_table;
+  end if;
+  if v_org is null then
+    raise exception 'You must belong to an organisation';
+  end if;
+
+  -- Bypassing RLS means doing its job by hand: never touch another org's row.
+  execute format('select org_id from public.%I where id = $1 and deleted_at is null', p_table)
+    into v_row_org using p_id;
+
+  if v_row_org is null or v_row_org <> v_org then
+    raise exception 'Not found';
   end if;
 
   execute format('update public.%I set deleted_at = now() where id = $1', p_table)

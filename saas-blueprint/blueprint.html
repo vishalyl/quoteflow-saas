@@ -1,0 +1,1123 @@
+<title>QuoteFlow → SaaS: Conversion Blueprint</title>
+<style>
+  :root {
+    --paper:      #F5F6F4;
+    --surface:    #FFFFFF;
+    --surface-2:  #EBEEEA;
+    --ink:        #14202A;
+    --ink-2:      #3B4950;
+    --muted:      #6B787D;
+    --rule:       #D7DCD8;
+    --rule-soft:  #E5E9E5;
+    --accent:     #0E5F6B;
+    --accent-ink: #0A4750;
+    --accent-soft:#DDEBEC;
+    --crit:       #A5371F;
+    --crit-soft:  #F6E3DD;
+    --warn:       #7E5A0B;
+    --warn-soft:  #F5EBD5;
+    --ok:         #2C6742;
+    --ok-soft:    #DEEDE2;
+
+    --serif: Georgia, 'Iowan Old Style', 'Times New Roman', Times, serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #101820;
+      --surface:    #16202A;
+      --surface-2:  #1C2831;
+      --ink:        #E7ECE9;
+      --ink-2:      #B9C5C7;
+      --muted:      #87979C;
+      --rule:       #2A3740;
+      --rule-soft:  #222E36;
+      --accent:     #63C6CE;
+      --accent-ink: #9BDDE2;
+      --accent-soft:#15313A;
+      --crit:       #E79178;
+      --crit-soft:  #3A1F18;
+      --warn:       #D9B25C;
+      --warn-soft:  #33280F;
+      --ok:         #7FC198;
+      --ok-soft:    #16301F;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #101820;
+    --surface:    #16202A;
+    --surface-2:  #1C2831;
+    --ink:        #E7ECE9;
+    --ink-2:      #B9C5C7;
+    --muted:      #87979C;
+    --rule:       #2A3740;
+    --rule-soft:  #222E36;
+    --accent:     #63C6CE;
+    --accent-ink: #9BDDE2;
+    --accent-soft:#15313A;
+    --crit:       #E79178;
+    --crit-soft:  #3A1F18;
+    --warn:       #D9B25C;
+    --warn-soft:  #33280F;
+    --ok:         #7FC198;
+    --ok-soft:    #16301F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 48px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px 120px;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    grid-column: 1 / -1;
+    border-bottom: 2px solid var(--ink);
+    padding: 56px 0 22px;
+    margin-bottom: 44px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .masthead h1 {
+    font-family: var(--serif);
+    font-size: clamp(30px, 4.4vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+  .masthead .standfirst {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--ink-2);
+    max-width: 60ch;
+    margin: 0;
+  }
+  .stamp {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.9;
+    white-space: nowrap;
+  }
+  .stamp b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- toc rail ---------- */
+  .rail { position: relative; }
+  .toc {
+    position: sticky;
+    top: 28px;
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+  .toc-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+    display: block;
+    margin-bottom: 12px;
+  }
+  .toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+  .toc a {
+    color: var(--ink-2);
+    text-decoration: none;
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 4px;
+    padding: 2px 0;
+    border-radius: 3px;
+  }
+  .toc a span { font-family: var(--mono); font-size: 11px; color: var(--muted); padding-top: 2px; }
+  .toc a:hover { color: var(--accent); }
+  .toc a:hover span { color: var(--accent); }
+  .toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- body ---------- */
+  main { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+
+  section { padding-top: 26px; scroll-margin-top: 20px; }
+  section + section { border-top: 1px solid var(--rule); margin-top: 34px; }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 29px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 12px;
+  }
+  h3 {
+    font-family: var(--sans);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    margin: 34px 0 10px;
+  }
+  h4 {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin: 24px 0 8px;
+  }
+  p { margin: 0 0 14px; max-width: 72ch; }
+  ul, ol.body-list { margin: 0 0 16px; padding-left: 20px; max-width: 72ch; }
+  li { margin-bottom: 7px; }
+  a { color: var(--accent); }
+  strong { font-weight: 650; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--rule-soft);
+  }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 28px 0; }
+
+  /* ---------- devices ---------- */
+  .lede {
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 64ch;
+    margin-bottom: 22px;
+  }
+
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-radius: 2px;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout.hot { border-left-color: var(--crit); background: var(--crit-soft); }
+  .callout.hot code { background: transparent; border-color: transparent; padding: 0; }
+
+  .verdict-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 26px 0;
+  }
+  .verdict {
+    background: var(--surface);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .verdict .n {
+    font-family: var(--serif);
+    font-size: 30px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .verdict .k {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .verdict .d { font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 3px;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: 1px;
+  }
+  .p0 { background: var(--crit-soft); color: var(--crit); border: 1px solid var(--crit); }
+  .p1 { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
+  .p2 { background: var(--surface-2); color: var(--muted); border: 1px solid var(--rule); }
+  .yes { background: var(--ok-soft); color: var(--ok); border: 1px solid var(--ok); }
+
+  .scroll { overflow-x: auto; margin: 18px 0 24px; border: 1px solid var(--rule); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.tight { white-space: nowrap; }
+
+  .finding {
+    display: grid;
+    grid-template-columns: 62px minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .finding:first-of-type { border-top: 1px solid var(--rule); }
+  .finding h5 { margin: 0 0 5px; font-size: 15.5px; font-weight: 650; }
+  .finding p { margin: 0 0 8px; font-size: 14.5px; color: var(--ink-2); }
+  .finding p:last-child { margin-bottom: 0; }
+  .finding .where {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 20px 22px;
+    margin: 16px 0;
+  }
+  .phase-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--rule-soft);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .phase-head h3 { margin: 0; font-size: 17px; }
+  .phase-head .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  .phase ul { margin-bottom: 0; }
+
+  .pull {
+    font-family: var(--serif);
+    font-size: 21px;
+    line-height: 1.4;
+    color: var(--ink);
+    border-left: 3px solid var(--accent);
+    padding: 4px 0 4px 20px;
+    margin: 26px 0;
+    max-width: 58ch;
+  }
+
+  .cols2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 26px; }
+  .cols2 > div > h4 { margin-top: 0; }
+
+  .footnote { font-size: 13px; color: var(--muted); max-width: 72ch; }
+
+  code.block {
+    display: block;
+    padding: 14px 16px;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.55;
+    font-size: 12.5px;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 20px 80px; }
+    .rail { margin-bottom: 32px; }
+    .toc { position: static; }
+    .toc ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 18px; }
+    .masthead { padding-top: 36px; }
+    .stamp { text-align: left; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div>
+      <h1>QuoteFlow → SaaS</h1>
+      <p class="standfirst">A full audit of what exists today, everything that has to change before other companies can pay for it, and how to sell it in a market where Tally is the incumbent everyone already trusts.</p>
+    </div>
+    <div class="stamp">
+      Prepared <b>11 Aug 2026</b><br />
+      Codebase <b>7,173 LOC · 43 files</b><br />
+      Status <b>Single-tenant internal tool</b>
+    </div>
+  </header>
+
+  <div class="rail">
+    <nav class="toc" aria-label="Contents">
+      <span class="toc-label">Contents</span>
+      <ol>
+        <li><a href="#verdict"><span>00</span>The verdict</a></li>
+        <li><a href="#inventory"><span>01</span>What you have today</a></li>
+        <li><a href="#audit"><span>02</span>Code &amp; architecture audit</a></li>
+        <li><a href="#missing"><span>03</span>The SaaS you don't have</a></li>
+        <li><a href="#architecture"><span>04</span>Target architecture</a></li>
+        <li><a href="#roadmap"><span>05</span>Rebuild roadmap</a></li>
+        <li><a href="#features"><span>06</span>Features: add, defer, refuse</a></li>
+        <li><a href="#tally"><span>07</span>Versus Tally</a></li>
+        <li><a href="#competitors"><span>08</span>The rest of the field</a></li>
+        <li><a href="#pricing"><span>09</span>Pricing &amp; packaging</a></li>
+        <li><a href="#gtm"><span>10</span>How to market it</a></li>
+        <li><a href="#metrics"><span>11</span>Metrics &amp; unit economics</a></li>
+        <li><a href="#decisions"><span>12</span>Decisions you owe</a></li>
+      </ol>
+    </nav>
+  </div>
+
+  <main>
+
+    <!-- ============ 00 ============ -->
+    <section id="verdict">
+      <span class="kicker">00 — The verdict</span>
+      <h2>You have a strong product idea inside a prototype that cannot be sold as-is</h2>
+
+      <p class="lede">QuoteFlow's core insight is genuinely good and genuinely underserved: quotation-level pricing intelligence for Indian B2B traders. The product logic is real, the workflow matches how these businesses actually operate, and the OCR-to-quote flow is a legitimate demo hook. But the thing you built is a single-company internal tool with no tenancy, no real authentication, and secrets shipped to the browser. Roughly 70% of the work between here and a sellable SaaS is not features — it is foundations.</p>
+
+      <div class="verdict-grid">
+        <div class="verdict">
+          <span class="n">4</span>
+          <span class="k">P0 blockers</span>
+          <span class="d">Any one of them makes charging money negligent.</span>
+        </div>
+        <div class="verdict">
+          <span class="n">0</span>
+          <span class="k">Tenancy</span>
+          <span class="d">No org concept anywhere in the schema or code.</span>
+        </div>
+        <div class="verdict">
+          <span class="n">0</span>
+          <span class="k">Tests</span>
+          <span class="d">And no CI, no migrations, no staging.</span>
+        </div>
+        <div class="verdict">
+          <span class="n">~14</span>
+          <span class="k">Weeks to v1</span>
+          <span class="d">Solo, focused, reusing the UI you already have.</span>
+        </div>
+      </div>
+
+      <p><strong>The single most important strategic call in this document:</strong> do not position QuoteFlow against Tally. Tally owns the accounting ledger and will keep owning it. Position QuoteFlow <em>upstream</em> of Tally — the pre-sale layer where quotes get priced, sent, chased and won — and make "exports cleanly into Tally" a feature, not a fight. Section 07 covers this in detail.</p>
+
+      <p>The rest of this document is organised so you can work top to bottom: what exists, what's broken, what a SaaS actually requires, what to build in what order, what to charge, and how to sell it.</p>
+    </section>
+
+    <!-- ============ 01 ============ -->
+    <section id="inventory">
+      <span class="kicker">01 — Inventory</span>
+      <h2>What you have today, feature by feature</h2>
+
+      <p>Read from the code rather than the docs — the markdown files in the repo describe several things that are no longer true (the seed-on-mount behaviour described in <code>CLAUDE.md</code> no longer exists in <code>App.jsx</code>, for instance).</p>
+
+      <h3>Shipped and working</h3>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Capability</th><th>Where</th><th>What it actually does</th><th>Quality</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="tight">AI requirement capture</td>
+              <td class="tight"><code>FileUploader.jsx</code></td>
+              <td>Up to 10 images → base64 → GPT-4o-mini vision call with a terse JSON schema → editable rows. Tesseract.js is still a dependency but the OpenAI path replaced it.</td>
+              <td><span class="chip yes">Strong</span> the demo hook</td>
+            </tr>
+            <tr>
+              <td class="tight">4-step quote wizard</td>
+              <td class="tight"><code>QuotationUpload.jsx</code></td>
+              <td>Upload → company/date → item table with mapping → preview. Draft held in a Zustand store; save-to-master at any point.</td>
+              <td><span class="chip yes">Good</span></td>
+            </tr>
+            <tr>
+              <td class="tight">Line-item pricing engine</td>
+              <td class="tight"><code>QuotationDetail.jsx</code>, <code>EditableTable.jsx</code></td>
+              <td>Cost-based margin, bidirectional: edit cost or quoted → margin recalculates; edit margin → quoted recalculates. Margin locked until cost exists.</td>
+              <td><span class="chip yes">Good</span> logic duplicated in 2 files</td>
+            </tr>
+            <tr>
+              <td class="tight">Product mapping</td>
+              <td class="tight"><code>ProductMappingModal.jsx</code>, <code>Products.jsx</code></td>
+              <td>Free-text product names → canonical master products, so "O-Ring 25" and "Gasket 25mm Ring" aggregate into one history.</td>
+              <td><span class="chip yes">Differentiator</span></td>
+            </tr>
+            <tr>
+              <td class="tight">Price history intelligence</td>
+              <td class="tight"><code>PriceHistoryModal.jsx</code>, <code>queries.js</code></td>
+              <td>Per product: every past quote split into <em>this client</em> vs <em>other clients</em>, with cost, margin, qty, win/loss.</td>
+              <td><span class="chip yes">Differentiator</span></td>
+            </tr>
+            <tr>
+              <td class="tight">Item-level win/loss</td>
+              <td class="tight"><code>statusUtils.js</code></td>
+              <td>Each line is won/lost/pending; the header status derives — all won → won, some won → partial_win, else pending/lost. This is more honest than header-only CRMs.</td>
+              <td><span class="chip yes">Differentiator</span></td>
+            </tr>
+            <tr>
+              <td class="tight">Analytics dashboard</td>
+              <td class="tight"><code>Dashboard.jsx</code>, <code>Charts.jsx</code></td>
+              <td>Pipeline value, top prospect, top supplier, incomplete-data alert, 3-day follow-up alert, monthly win-rate trend, company/supplier spotlights, top products. Drill-down modals on every KPI.</td>
+              <td><span class="chip p1">Good UX, unscalable queries</span></td>
+            </tr>
+            <tr>
+              <td class="tight">Master database</td>
+              <td class="tight"><code>MasterDatabase.jsx</code></td>
+              <td>Every line item ever, filterable by status/company/product/date/margin, editable in place, CSV export.</td>
+              <td><span class="chip yes">Good</span></td>
+            </tr>
+            <tr>
+              <td class="tight">Client-ready output</td>
+              <td class="tight"><code>ClientViewModal.jsx</code></td>
+              <td>Clean printable/downloadable quote view via <code>html-to-image</code> — WhatsApp-ready JPEG.</td>
+              <td><span class="chip p1">Works, but not a real document</span></td>
+            </tr>
+            <tr>
+              <td class="tight">CRM-lite records</td>
+              <td class="tight"><code>Companies</code>, <code>Suppliers</code>, detail pages</td>
+              <td>Name, contact, notes, plus per-entity deal history and analytics.</td>
+              <td><span class="chip p2">Thin</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Built but disconnected</h3>
+      <p>These exist in the repo and are not reachable in the running app. Decide explicitly: revive or delete.</p>
+      <ul>
+        <li><strong>The entire Requirements module</strong> — <code>Requirements.jsx</code>, <code>RequirementDetail.jsx</code>, <code>RequirementUpload.jsx</code> plus the <code>requirements</code>/<code>requirement_items</code> tables and six query functions. No routes in <code>App.jsx</code>, no sidebar entry. This was the inbound-RFQ half of the product; the quotation half absorbed it.</li>
+        <li><strong><code>HistoricalPanel.jsx</code></strong> — imports <code>getHistoricalData</code>, which does not exist in <code>queries.js</code> (the real function is <code>getMasterProductHistory</code>). It only survives because its one consumer, <code>RequirementDetail</code>, is unrouted. It would throw the moment you re-enable that page.</li>
+        <li><strong><code>DataTable.jsx</code>, <code>testParser.js</code></strong> — never imported.</li>
+        <li><strong><code>redistributeSuppliers()</code></strong> — a demo-data function that assigns a <em>random</em> supplier to every quotation item in the database. It is imported into two production pages (<code>MasterDatabase</code>, <code>Suppliers</code>). Delete it before anyone else's data is in that table.</li>
+      </ul>
+
+      <h3>The data model</h3>
+      <p>Eight tables, inferred from queries: <code>companies</code>, <code>suppliers</code>, <code>master_products</code>, <code>product_mappings</code>, <code>quotations</code>, <code>quotation_items</code>, <code>requirements</code>, <code>requirement_items</code>. It is a reasonable shape for the domain. What's missing is everything a multi-company product needs — no <code>organisations</code>, no <code>users</code>, no <code>org_id</code> on any row, no audit columns, no soft deletes, no currency, no tax, no versioning. Section 04 gives the target schema.</p>
+    </section>
+
+    <!-- ============ 02 ============ -->
+    <section id="audit">
+      <span class="kicker">02 — Audit</span>
+      <h2>What's broken, ranked by whether it stops you selling</h2>
+
+      <p class="lede">P0 means: charging money for this, in this state, exposes you and your customers to real harm. Fix all four before a single external user touches it.</p>
+
+      <h3>P0 — blockers</h3>
+
+      <div class="finding">
+        <div><span class="chip p0">P0-1</span></div>
+        <div>
+          <h5>Authentication is decorative</h5>
+          <p class="where">src/pages/Login.jsx · src/stores/authStore.js · credentials.json</p>
+          <p>Login compares a typed username and password against <code>credentials.json</code> — a file that is <strong>bundled into the JavaScript shipped to every browser</strong> and <strong>committed to git</strong> (it is not in <code>.gitignore</code>). Three plaintext user/password pairs are in your repo history right now.</p>
+          <p>Worse, the auth state is a boolean in a Zustand <code>persist</code> store. Anyone can open devtools and run <code>localStorage.setItem('auth-storage', '{"state":{"isAuthenticated":true},"version":0}')</code> to be "logged in". There is no session, no token, no server-side check.</p>
+          <p><strong>Fix:</strong> Supabase Auth (email + password, magic link, or Google OAuth). Delete <code>credentials.json</code> and purge it from git history; rotate those passwords anywhere they were reused.</p>
+        </div>
+      </div>
+
+      <div class="finding">
+        <div><span class="chip p0">P0-2</span></div>
+        <div>
+          <h5>The database is wide open to the internet</h5>
+          <p class="where">src/lib/supabase.js · every function in src/db/queries.js</p>
+          <p>The client talks to Supabase directly with the anon key. That is normal <em>only</em> when Row Level Security is enabled and every table has policies. There is no RLS anywhere in this repo — no policies, no <code>auth.uid()</code>, no migrations that would create them. Since the anon key is public by design (it's in the JS bundle), anyone who opens the site can read, edit, or delete every quotation, every cost price, and every margin in the database using nothing but the browser console.</p>
+          <p>For a pricing-intelligence product this is the worst possible leak: cost prices and margins are the most commercially sensitive numbers a trading company owns.</p>
+          <p><strong>Fix:</strong> RLS on every table, keyed to organisation membership, before anything else. Verify by attempting a cross-org read with a real token — not by reading the policy and assuming.</p>
+        </div>
+      </div>
+
+      <div class="finding">
+        <div><span class="chip p0">P0-3</span></div>
+        <div>
+          <h5>Your OpenAI key is in the browser bundle</h5>
+          <p class="where">src/components/Upload/FileUploader.jsx:28</p>
+          <p><code>VITE_OPENAI_API_KEY</code> — the <code>VITE_</code> prefix means Vite inlines it into the production JavaScript. Anyone who loads the app can extract it from the bundle and spend your OpenAI balance until you notice. There is no rate limit, no per-tenant quota, no usage accounting.</p>
+          <p><strong>Fix:</strong> move the vision call into a Supabase Edge Function (or any server route). The browser uploads the image, the server holds the key, checks the caller's org, enforces a monthly page quota, and logs the token spend against that org. This is also what makes AI usage billable later.</p>
+        </div>
+      </div>
+
+      <div class="finding">
+        <div><span class="chip p0">P0-4</span></div>
+        <div>
+          <h5>No multi-tenancy of any kind</h5>
+          <p class="where">Whole codebase</p>
+          <p>There is no organisation, workspace, or account concept — not in the schema, not in queries, not in the UI. Every query is "select everything". Onboarding a second customer today means either deploying a second copy of the entire stack per customer, or having two customers' cost prices in the same tables with nothing separating them.</p>
+          <p>This is the single largest piece of work in the conversion, and it touches all 351 lines of <code>queries.js</code>, all 8 tables, and the seed/import paths.</p>
+        </div>
+      </div>
+
+      <h3>P1 — will hurt within the first ten customers</h3>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Issue</th><th>Where</th><th>Consequence</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="tight">Dashboard loads the entire database</td>
+              <td class="tight"><code>getDashboardData()</code></td>
+              <td>Two unfiltered <code>select</code>s pull every quotation and every line item into the browser, then aggregate in JS. Supabase caps at 1,000 rows by default, so the dashboard silently goes <em>wrong</em> — not slow — past that. Same pattern in <code>getMasterDatabase()</code>.</td>
+            </tr>
+            <tr>
+              <td class="tight">Saving is a serial write loop</td>
+              <td class="tight"><code>QuotationDetail.handleSave</code></td>
+              <td>One round trip per line item, awaited in sequence. A 40-line quote is 41 requests, and a failure halfway leaves the quote partially saved with no rollback. Needs a single transactional RPC.</td>
+            </tr>
+            <tr>
+              <td class="tight">Destructive edit strategy</td>
+              <td class="tight"><code>updateQuotationWithItems()</code></td>
+              <td>Deletes all items then re-inserts them. New row IDs each time, so any future audit trail, comment, or attachment attached to a line item is orphaned on every save.</td>
+            </tr>
+            <tr>
+              <td class="tight">No migrations</td>
+              <td class="tight"><code>SUPABASE_MIGRATION.sql</code> + a README telling you to paste it into the dashboard</td>
+              <td>Schema lives in someone's memory and in the Supabase UI. With customers you need versioned, replayable migrations and a staging database that matches production.</td>
+            </tr>
+            <tr>
+              <td class="tight">No tests, no CI, no staging</td>
+              <td class="tight">—</td>
+              <td>Every deploy is a hand-verified gamble. The pricing maths alone (margin/quoted round-tripping, partial-win derivation) needs unit tests, because a rounding bug here is money.</td>
+            </tr>
+            <tr>
+              <td class="tight">No error reporting</td>
+              <td class="tight">~24 <code>console.error</code> calls</td>
+              <td>Every failure is swallowed into a console the customer will never open. You will hear about bugs only as churn.</td>
+            </tr>
+            <tr>
+              <td class="tight">Hardcoded to one customer</td>
+              <td class="tight"><code>index.html</code>, <code>Sidebar.jsx</code>, page subtitles</td>
+              <td>"Industrial Rubber Products" and the "IRP" logo mark are baked into the shell and the browser title.</td>
+            </tr>
+            <tr>
+              <td class="tight">Demo-data code shipped to production</td>
+              <td class="tight"><code>seedData.js</code> imported by two pages</td>
+              <td><code>redistributeSuppliers()</code> randomises supplier assignment across every item in the database. One accidental call on a live tenant is unrecoverable.</td>
+            </tr>
+            <tr>
+              <td class="tight">Deletes are hard deletes</td>
+              <td class="tight"><code>deleteQuotation</code>, <code>deleteCompany</code>, …</td>
+              <td>One confirm dialog stands between a user and permanently destroying a quotation. No soft delete, no undo, no trash, no per-tenant backup story.</td>
+            </tr>
+            <tr>
+              <td class="tight">No audit trail</td>
+              <td class="tight">Schema</td>
+              <td>Nothing records who changed a price and when. For a multi-user product where margins are the asset, "who dropped this quote by 8%?" is a question customers <em>will</em> ask.</td>
+            </tr>
+            <tr>
+              <td class="tight">₹-only, tax-free, single-unit</td>
+              <td class="tight">Everywhere</td>
+              <td>Currency symbol and <code>en-IN</code> formatting are hardcoded across ~15 files. No GST fields, no HSN codes, no discounts, no freight, no terms. Indian buyers will ask for all of these on day one.</td>
+            </tr>
+            <tr>
+              <td class="tight">Duplicate-name workarounds</td>
+              <td class="tight">4+ files dedupe companies/products by lowercased name in the UI</td>
+              <td>A symptom of missing DB constraints. Fix with unique indexes per org, not client-side <code>Set</code> filtering.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>P2 — quality debt, fix opportunistically</h3>
+      <ul>
+        <li><strong>No type safety.</strong> Plain JS with heavy runtime string↔number coercion around money. TypeScript on the data layer and pricing utilities would pay for itself.</li>
+        <li><strong>Styling is split three ways</strong> — a global CSS file, large inline style objects, and per-file style constants. A component library or at least a token-driven set of primitives is needed before the surface area doubles.</li>
+        <li><strong>Charts.jsx is 988 lines</strong> — the largest file in the project, mixing aggregation logic with rendering. Aggregations belong in SQL views anyway (see P1).</li>
+        <li><strong>Accessibility</strong> — clickable <code>div</code>s, no focus management in modals, no keyboard escape, emoji as the only icon system.</li>
+        <li><strong>Mobile</strong> — a fixed sidebar and 860px-min tables. Your buyer's salespeople live on phones and WhatsApp; today the app is desktop-only.</li>
+        <li><strong>React 18 / Vite 4</strong> — a version behind on both. Cheap to bump now, annoying later.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 03 ============ -->
+    <section id="missing">
+      <span class="kicker">03 — The gap</span>
+      <h2>The SaaS around the product, which doesn't exist yet</h2>
+
+      <p class="lede">The mistake most people make converting an internal tool is thinking the work is features. It isn't. A SaaS is roughly a dozen systems that have nothing to do with quotations, and every one of them is currently at zero.</p>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>System</th><th>Today</th><th>Minimum for v1</th><th>Later</th></tr></thead>
+          <tbody>
+            <tr><td class="tight"><strong>Tenancy</strong></td><td>None</td><td><code>organisations</code> + <code>org_id</code> on every table + RLS + JWT org claim</td><td>Sub-orgs for multi-branch; per-branch data scoping</td></tr>
+            <tr><td class="tight"><strong>Identity</strong></td><td>JSON file</td><td>Supabase Auth, email verification, password reset, session expiry</td><td>Google SSO, SAML for enterprise, 2FA</td></tr>
+            <tr><td class="tight"><strong>Roles</strong></td><td>None</td><td>Owner / Manager / Sales. Critically: <em>cost price and margin visible only to Owner+Manager</em></td><td>Custom roles, field-level permissions, territory scoping</td></tr>
+            <tr><td class="tight"><strong>Invites &amp; team</strong></td><td>None</td><td>Email invite with token, seat counting, remove user, transfer ownership</td><td>Bulk invite, domain auto-join</td></tr>
+            <tr><td class="tight"><strong>Billing</strong></td><td>None</td><td>Razorpay subscriptions (UPI/netbanking/cards — Stripe is awkward for Indian domestic B2B), plan table, seat/quota entitlements, GST invoice with your GSTIN, dunning on failed payment</td><td>Annual prepay, usage-based AI credits, partner/reseller billing</td></tr>
+            <tr><td class="tight"><strong>Onboarding</strong></td><td>None</td><td>Self-serve signup, org creation, <strong>bulk import of companies/suppliers/products from Excel</strong>, sample data toggle, 5-step checklist</td><td>Guided tours, in-app help, migration service for paid tiers</td></tr>
+            <tr><td class="tight"><strong>Admin backoffice</strong></td><td>None</td><td>A page only you can see: list orgs, usage, plan, last activity; impersonate-with-consent for support</td><td>Health scores, churn-risk flags</td></tr>
+            <tr><td class="tight"><strong>Observability</strong></td><td>console.error</td><td>Sentry (frontend + edge functions), uptime monitor, structured logs, PostHog or similar for funnels</td><td>Per-tenant performance dashboards, alerting on error-rate SLOs</td></tr>
+            <tr><td class="tight"><strong>Transactional email</strong></td><td>None</td><td>Resend/Postmark: verification, invite, password reset, follow-up digest, payment receipt. SPF/DKIM/DMARC on your domain.</td><td>Send quotes to clients directly from the app with open tracking</td></tr>
+            <tr><td class="tight"><strong>Data lifecycle</strong></td><td>None</td><td>Automated backups + a <em>tested</em> restore, full data export per org, hard-delete on request within 30 days</td><td>PITR, per-tenant restore, retention policies</td></tr>
+            <tr><td class="tight"><strong>Legal</strong></td><td>None</td><td>Terms, Privacy Policy, DPA, refund policy, India DPDP Act 2023 compliance basics (purpose limitation, breach notification, grievance officer contact)</td><td>ISO 27001 / SOC 2 when enterprise deals demand it</td></tr>
+            <tr><td class="tight"><strong>Support</strong></td><td>WhatsApp to you</td><td>Shared inbox, in-app widget, documented SLA per tier, a help centre with 20 articles</td><td>Chat, phone for Enterprise, regional-language support</td></tr>
+            <tr><td class="tight"><strong>Marketing site</strong></td><td>None</td><td>Landing page, pricing page, demo video, book-a-demo form, one case study (your friend's company — get the numbers before the relationship cools)</td><td>Blog/SEO engine, comparison pages, calculator</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout hot">
+        <p><strong>The role split is the one product decision hiding in this table.</strong> In an Indian trading company the owner does not want the junior salesperson seeing supplier cost prices — that knowledge is what stops staff from leaving and starting a competing firm. Getting cost-price visibility right, per role, is not a nice-to-have; it is frequently the deciding factor in whether the owner buys. Build it into the RLS policies, not just the UI.</p>
+      </div>
+    </section>
+
+    <!-- ============ 04 ============ -->
+    <section id="architecture">
+      <span class="kicker">04 — Target architecture</span>
+      <h2>What it should look like on the other side</h2>
+
+      <p>Keep the stack. React + Vite + Supabase is a perfectly good foundation for this, and rewriting into Next.js buys you SEO for the marketing site (which can be a separate static site anyway) at the cost of months. The changes are structural, not technological.</p>
+
+      <h3>4.1 The tenancy model</h3>
+      <p>Add two tables and one column everywhere.</p>
+      <code class="block">organisations
+  id, name, slug, gstin, address, logo_url, currency,
+  plan, plan_status, trial_ends_at, seats_purchased,
+  ai_pages_used_this_period, created_at
+
+memberships
+  id, org_id, user_id, role ('owner'|'manager'|'sales'),
+  invited_by, invited_at, accepted_at
+
+-- then, on every existing table:
+ALTER TABLE quotations ADD COLUMN org_id uuid NOT NULL
+  REFERENCES organisations(id) ON DELETE CASCADE;
+CREATE INDEX ON quotations (org_id, date DESC);</code>
+
+      <p>Every RLS policy then reduces to one predicate: the row's <code>org_id</code> must be in the caller's memberships. Put the user's active org in a JWT custom claim so the check is a claim comparison rather than a subquery on every row.</p>
+
+      <code class="block">CREATE POLICY org_isolation ON quotations
+  FOR ALL TO authenticated
+  USING  (org_id = (auth.jwt() -> 'app_metadata' ->> 'org_id')::uuid)
+  WITH CHECK (org_id = (auth.jwt() -> 'app_metadata' ->> 'org_id')::uuid);
+
+-- cost visibility: a separate policy on the sensitive columns,
+-- or a sales-facing view that simply omits cost_price and margin.</code>
+
+      <p><strong>Do not rely on the frontend passing <code>org_id</code> in filters.</strong> Set it server-side from the token, via a column default or a trigger. Any tenancy that depends on the client remembering to add a <code>.eq('org_id', …)</code> will leak the first time someone writes a query in a hurry.</p>
+
+      <h3>4.2 Push aggregation into the database</h3>
+      <p>Replace <code>getDashboardData()</code> with SQL. A handful of views or RPCs — <code>dashboard_kpis(org_id, from, to)</code>, <code>monthly_win_rate(org_id)</code>, <code>product_price_history(org_id, master_product_id, company_id)</code> — return a few dozen rows each instead of the whole database. Paginate the master database and quotation list with keyset pagination. This one change removes the silent 1,000-row correctness bug and makes the dashboard load in tens of milliseconds at any tenant size.</p>
+
+      <h3>4.3 Move all secrets and AI behind Edge Functions</h3>
+      <ul>
+        <li><code>POST /extract-requirement</code> — accepts an uploaded image reference, verifies membership, checks the org's remaining AI page quota, calls the vision model, records <code>ai_usage</code> (tokens, cost, org, user), returns rows. The key never leaves the server.</li>
+        <li><code>POST /save-quotation</code> — one transactional write for header + items, so a 40-line quote is one request and either fully saves or doesn't.</li>
+        <li><code>POST /razorpay-webhook</code> — subscription lifecycle → <code>plan_status</code>.</li>
+        <li>Store uploaded requirement images in Supabase Storage under an org-scoped path with its own RLS. Right now those images are only in memory; customers will want to see the original sheet next to the quote.</li>
+      </ul>
+
+      <h3>4.4 Restructure the frontend</h3>
+      <ul>
+        <li><strong>Kill the raw <code>queries.js</code> pattern at the page level.</strong> Wrap it in TanStack Query so you get caching, retries, loading/error states and cache invalidation for free — that alone removes a large class of the "stale after save" bugs.</li>
+        <li><strong>Extract the pricing engine</strong> into one tested module (<code>src/domain/pricing.ts</code>). It is currently implemented twice, in <code>QuotationDetail</code> and <code>EditableTable</code>, with subtly different behaviour on empty inputs.</li>
+        <li><strong>Route guards</strong> — real ones, based on session and role, not a boolean in localStorage.</li>
+        <li><strong>Tenant branding</strong> — org name, logo and quote template pulled from the <code>organisations</code> row, so the shell and the client-facing document reflect the customer, not IRP.</li>
+      </ul>
+
+      <h3>4.5 Engineering hygiene</h3>
+      <ul>
+        <li>Supabase CLI migrations in the repo; a <code>staging</code> project that mirrors production; seed data only in local/staging.</li>
+        <li>GitHub Actions: lint, typecheck, unit tests (Vitest) on the pricing/status logic, Playwright smoke test for signup → create quote → save.</li>
+        <li>Sentry with release tagging; PostHog for activation funnels.</li>
+        <li>A written incident + restore drill. Practise restoring one tenant's data from backup <em>before</em> you need to.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 05 ============ -->
+    <section id="roadmap">
+      <span class="kicker">05 — Sequencing</span>
+      <h2>Rebuild roadmap</h2>
+
+      <p>Estimates assume one experienced full-time developer reusing the existing UI. Halve them if two people work in parallel on backend and product surface; double them if this is evenings and weekends.</p>
+
+      <div class="phase">
+        <div class="phase-head">
+          <h3>Phase 0 · Stop the bleeding</h3>
+          <span class="meta">1 week · before you show anyone</span>
+        </div>
+        <ul>
+          <li>Delete <code>credentials.json</code>, purge from git history, rotate anything reused.</li>
+          <li>Rotate the OpenAI key (assume it is compromised) and put a hard spend cap on the account today.</li>
+          <li>Delete <code>seedData.js</code> and its imports; delete <code>DataTable.jsx</code>, <code>testParser.js</code>; decide on the Requirements module.</li>
+          <li>Enable RLS on all tables with a deny-all default so the current database stops being world-writable while you rebuild.</li>
+          <li>Set up the repo properly: migrations, staging project, CI running lint.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <h3>Phase 1 · Multi-tenant foundation</h3>
+          <span class="meta">4–5 weeks · the unglamorous core</span>
+        </div>
+        <ul>
+          <li>Supabase Auth; signup/login/reset/verify; session-based route guards.</li>
+          <li><code>organisations</code> + <code>memberships</code>; <code>org_id</code> backfill migration; RLS policies on all eight tables; cross-tenant isolation test suite.</li>
+          <li>Roles and the cost-price visibility rule, enforced in the database.</li>
+          <li>Team invites by email; seat counting.</li>
+          <li>Edge functions: AI extraction proxy with quota, transactional quote save.</li>
+          <li>Dashboard and master-database queries moved to SQL with pagination.</li>
+          <li>Strip IRP branding; org-level branding from the DB.</li>
+          <li>Sentry, uptime monitoring, backups verified by an actual restore.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <h3>Phase 2 · Sellable product</h3>
+          <span class="meta">4 weeks · the things buyers ask for in demo #1</span>
+        </div>
+        <ul>
+          <li><strong>Proper quotation PDF</strong> — letterhead, terms, validity, GST/HSN, signature block, quote number series. The JPEG screenshot is a demo trick; a PDF with your customer's letterhead is a purchase reason.</li>
+          <li><strong>Excel/CSV import wizard</strong> for companies, suppliers, products, and historical quotes. Without this, a new customer's account is empty and the pricing intelligence — your whole differentiator — has nothing to show for months. This is the highest-leverage feature in the entire plan.</li>
+          <li>GST, discounts, freight, payment terms, quote validity, revision numbers (v1/v2 of the same quote).</li>
+          <li>Email the quote to the client from the app; log when it was sent.</li>
+          <li>Razorpay subscriptions, plan gating, GST invoices, dunning.</li>
+          <li>Self-serve signup with a 14-day trial and sample data.</li>
+          <li>Marketing site, pricing page, demo video, help centre.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <h3>Phase 3 · The moat</h3>
+          <span class="meta">6+ weeks · after the first ten paying customers</span>
+        </div>
+        <ul>
+          <li><strong>Price recommendation</strong> — replace the history table with a suggestion: "quote ₹512–₹528; at ₹520 you have won 7 of 9 with this client; below ₹495 you're under your own average margin." This is the leap from <em>reporting</em> to <em>intelligence</em>, and it is what justifies the name.</li>
+          <li><strong>WhatsApp integration</strong> — send the quote via WhatsApp Business API, and ideally accept requirement images inbound. Your users already live there; this removes the app-opening problem entirely.</li>
+          <li><strong>Tally export/connector</strong> (section 07).</li>
+          <li>Mobile-first quoting view for salespeople in the field.</li>
+          <li>Approval workflow: quotes below X% margin need the owner's sign-off.</li>
+          <li>Anonymised benchmark data across tenants — only with explicit opt-in, and only ever aggregated. Handled badly this is a lawsuit; handled well it is a genuinely unique asset.</li>
+        </ul>
+      </div>
+
+      <p class="footnote">Total to a defensible v1: roughly 14 weeks of focused work, of which about 5 are pure infrastructure with nothing visible to show for it. Budget for that psychologically — it is the phase where most conversions stall.</p>
+    </section>
+
+    <!-- ============ 06 ============ -->
+    <section id="features">
+      <span class="kicker">06 — Scope</span>
+      <h2>What to add, what to defer, what to refuse</h2>
+
+      <h3>Table stakes — you will lose deals without these</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Feature</th><th>Why it's non-negotiable</th><th>Phase</th></tr></thead>
+          <tbody>
+            <tr><td class="tight">Branded PDF quotation</td><td>The quote is the deliverable. A JPEG is not a business document.</td><td class="num">2</td></tr>
+            <tr><td class="tight">Historical data import</td><td>Your differentiator is history. An empty account has none. This determines time-to-value.</td><td class="num">2</td></tr>
+            <tr><td class="tight">GST / HSN / tax lines</td><td>Every Indian B2B quote carries them. Absence reads as "toy".</td><td class="num">2</td></tr>
+            <tr><td class="tight">Quote numbering &amp; revisions</td><td>Buyers reference "Quote #QT-2026-0412 rev 2". You currently have UUIDs.</td><td class="num">2</td></tr>
+            <tr><td class="tight">Role-based cost visibility</td><td>The owner's #1 objection. Also your #1 upsell to Manager tier.</td><td class="num">1</td></tr>
+            <tr><td class="tight">Mobile-usable quoting</td><td>Salespeople quote from the client's factory floor, on a phone.</td><td class="num">3</td></tr>
+            <tr><td class="tight">Audit log</td><td>"Who changed this price?" — multi-user products get asked this in month two.</td><td class="num">2</td></tr>
+            <tr><td class="tight">Email quote to client + sent status</td><td>Closes the loop between "quoted" and "followed up", which is your alert system's whole premise.</td><td class="num">2</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Differentiators — where to actually spend invention</h3>
+      <ul>
+        <li><strong>Prescriptive pricing.</strong> Today you show a table and make the salesperson interpret it. Show a recommended band, a win-probability estimate at the entered price, and a warning when they are quoting below their own historical winning price. This is a defensible product, not a report.</li>
+        <li><strong>Supplier cost intelligence.</strong> You already store cost per item per supplier. That is a supplier price index nobody else has: "Metal Hub has raised your cost on this SKU 11% in six months; Steel World is 6% cheaper on the same item." Purchase-side value on top of sales-side value, from data you already collect.</li>
+        <li><strong>Requirement-sheet ingestion as a channel, not a feature.</strong> The OCR is the demo hook. Make it a WhatsApp number the salesperson forwards the client's image to, that replies with a draft quote link. That is a story people retell.</li>
+        <li><strong>Quote-to-order conversion memory.</strong> You track item-level win/loss, which most CRMs don't. Lean into it: "you win 82% of gaskets and 31% of bearings — stop discounting gaskets."</li>
+      </ul>
+
+      <h3>Refuse, or at least defer past v2</h3>
+      <p>Every one of these is a request you will get, and every one of them will sink you if you say yes early.</p>
+      <ul>
+        <li><strong>Accounting, invoicing, ledgers, GST returns.</strong> This is Tally's territory, it is regulated, and it is where feature requests are infinite. Integrate; never rebuild.</li>
+        <li><strong>Full inventory management.</strong> Stock, batches, warehouses, godowns. Different product, ten times the surface area.</li>
+        <li><strong>Becoming a general CRM.</strong> Deal stages, activities, email sync, lead scoring. Zoho does this for ₹800/user and will always out-feature you. Stay the quotation layer.</li>
+        <li><strong>Per-customer bespoke features.</strong> The classic internal-tool-to-SaaS death: your first three customers each get a custom module and you now maintain three products. Make everything configuration, or say no.</li>
+        <li><strong>On-premise / self-hosted deployments.</strong> Asked for constantly by Indian manufacturers. It destroys your ability to ship. Answer with a security page and a data-export guarantee instead.</li>
+        <li><strong>A mobile app (native).</strong> A good responsive web app plus WhatsApp covers 95% of the need at 10% of the cost.</li>
+        <li><strong>Multi-currency and international.</strong> Not until an Indian beachhead is profitable. Focus is the only advantage you have over Zoho.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 07 ============ -->
+    <section id="tally">
+      <span class="kicker">07 — The incumbent</span>
+      <h2>QuoteFlow versus Tally</h2>
+
+      <p class="lede">Tally is not your competitor. Tally is your distribution channel, your integration target, and the reason your buyer already believes business software is worth paying for. Understanding exactly where the two products touch is the difference between a wedge and a losing fight.</p>
+
+      <h3>7.1 What Tally actually is</h3>
+      <p>TallyPrime is accounting-first: ledgers, vouchers, GST compliance, e-invoicing, e-way bills, inventory, payroll, statutory reports. It is sold as a perpetual desktop licence plus an annual subscription (TSS) for updates, through a very large partner and reseller network, and it is installed in a large share of Indian SMEs — the number usually cited is over two million businesses. It is trusted by the accountant, the owner, and the CA who audits them.</p>
+      <p>Tally <em>does</em> have quotation-adjacent capability: sales-order and quotation voucher types, price levels and price lists, party-wise reporting. That is where the products touch. What it does not have — and what its architecture makes unlikely — is win/loss learning, per-line pricing intelligence, image-to-quote capture, or a pre-sale pipeline that includes deals that never became a voucher.</p>
+
+      <h3>7.2 Head to head</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Dimension</th><th>TallyPrime</th><th>QuoteFlow (target v1)</th><th>Who wins</th></tr></thead>
+          <tbody>
+            <tr><td class="tight">Core job</td><td>Record what happened, file it with the government</td><td>Decide what to quote, and win it</td><td>Different jobs</td></tr>
+            <tr><td class="tight">Where in the cycle</td><td>Post-order: invoice → ledger → return</td><td>Pre-order: requirement → quote → follow-up → win</td><td><span class="chip yes">QuoteFlow</span> owns the gap</td></tr>
+            <tr><td class="tight">Quotation creation</td><td>Voucher entry, manual, keyboard-driven</td><td>Photo of a requirement sheet → draft in seconds</td><td><span class="chip yes">QuoteFlow</span></td></tr>
+            <tr><td class="tight">Pricing guidance</td><td>Price lists and levels you configure by hand</td><td>Learned from your own win/loss history per client per product</td><td><span class="chip yes">QuoteFlow</span></td></tr>
+            <tr><td class="tight">Win/loss analytics</td><td>Not applicable — lost deals never enter the books</td><td>Item-level won/lost/partial, win rates by client, supplier, product</td><td><span class="chip yes">QuoteFlow</span></td></tr>
+            <tr><td class="tight">Follow-up management</td><td>None</td><td>Ageing alerts on stale quotes</td><td><span class="chip yes">QuoteFlow</span></td></tr>
+            <tr><td class="tight">GST, e-invoice, e-way bill</td><td>Deep, certified, continuously updated with law changes</td><td>Tax fields on a quote, nothing statutory</td><td><span class="chip p0">Tally</span> — don't compete</td></tr>
+            <tr><td class="tight">Inventory &amp; stock</td><td>Full: batches, godowns, valuation</td><td>None</td><td><span class="chip p0">Tally</span></td></tr>
+            <tr><td class="tight">Accounting &amp; audit</td><td>The system of record; the CA insists on it</td><td>None</td><td><span class="chip p0">Tally</span></td></tr>
+            <tr><td class="tight">Deployment</td><td>Desktop-first, LAN, remote access as an add-on</td><td>Cloud, browser, phone-friendly</td><td><span class="chip yes">QuoteFlow</span> for field sales</td></tr>
+            <tr><td class="tight">Multi-user collaboration</td><td>Licensed per machine; awkward for a travelling sales team</td><td>Native, role-based, anywhere</td><td><span class="chip yes">QuoteFlow</span></td></tr>
+            <tr><td class="tight">Commercial model</td><td>Perpetual licence + annual TSS, sold via partners</td><td>Subscription, sold direct and via partners</td><td>Tally's model is friendlier to the Indian SME instinct — see 09</td></tr>
+            <tr><td class="tight">Trust &amp; distribution</td><td>Decades of it, plus tens of thousands of partners and every CA</td><td>Zero</td><td><span class="chip p0">Tally</span>, overwhelmingly</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pull">"Tally tells you what you sold. QuoteFlow tells you what to quote so that you sell it."</div>
+
+      <h3>7.3 The strategic play</h3>
+      <ol class="body-list">
+        <li><strong>Never say "instead of Tally".</strong> Every prospect's first defensive question is "we already have Tally". The answer is: "Good — keep it. Tally starts when the order is confirmed. We handle everything before that, and hand the won quote to Tally as a sales order."</li>
+        <li><strong>Build the Tally handoff early, in the cheapest form that works.</strong> A "Export won quote → Tally XML" button covers most of the need. Tally imports XML natively, and there are well-trodden XML/ODBC integration paths. This single button converts your biggest objection into a proof point.</li>
+        <li><strong>Recruit Tally partners as your channel.</strong> There are thousands of small firms who sell, install and support Tally for SMEs. They have the exact customer list you want, they are already in the office monthly, and they are hungry for something new to sell that doesn't cannibalise Tally. Give them 20–30% recurring commission. This is, realistically, your fastest path to the first hundred customers, and it is a channel Zoho and the international players don't work as hard.</li>
+        <li><strong>Borrow Tally's credibility in your copy.</strong> "Works alongside your Tally" on the landing page removes more friction than any feature list.</li>
+      </ol>
+
+      <p class="footnote">Verify Tally's current pricing, licence terms, and the exact capabilities of the TallyPrime release in market before putting any specific numbers in customer-facing material — these change with releases and I have not checked them against Tally's site today.</p>
+    </section>
+
+    <!-- ============ 08 ============ -->
+    <section id="competitors">
+      <span class="kicker">08 — The field</span>
+      <h2>Everyone else you'll be compared to</h2>
+
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Competitor</th><th>What they are</th><th>Where they beat you</th><th>Where you beat them</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="tight"><strong>Excel + WhatsApp</strong></td>
+              <td>The real incumbent, in ~80% of your prospects</td>
+              <td>Free, familiar, infinitely flexible, nobody has to be trained</td>
+              <td>Memory. Excel cannot tell you that ₹480 won and ₹520 lost with this client. Also multi-user, alerts, and 20 minutes saved per quote.</td>
+            </tr>
+            <tr>
+              <td class="tight"><strong>Zoho (CRM / Books / Inventory)</strong></td>
+              <td>The serious Indian SaaS incumbent, aggressive pricing, huge feature surface</td>
+              <td>Price, brand, breadth, integrations, an existing sales machine</td>
+              <td>They have quotes as a document feature, not a pricing-intelligence engine. No item-level win/loss learning, no requirement-sheet OCR. You are a specialist against a generalist.</td>
+            </tr>
+            <tr>
+              <td class="tight"><strong>Vyapar / myBillBook / Marg</strong></td>
+              <td>Cheap Indian billing/GST apps for small traders</td>
+              <td>Very low price, mobile-first, massive install base</td>
+              <td>They're billing tools. No pre-sale pipeline, no analytics of consequence. They also anchor your prospect's price expectations downward — be ready for it.</td>
+            </tr>
+            <tr>
+              <td class="tight"><strong>PandaDoc / Proposify / Qwilr</strong></td>
+              <td>Western proposal-document software</td>
+              <td>Beautiful documents, e-signature, template libraries</td>
+              <td>Priced in dollars, built for proposals not line-item industrial quoting, no cost/margin/supplier model, no India fit.</td>
+            </tr>
+            <tr>
+              <td class="tight"><strong>QuoteWerks / DealHub / PROS / Vendavo</strong></td>
+              <td>CPQ and price-optimisation software</td>
+              <td>This is literally your Phase 3 vision, done at enterprise scale, with real data science</td>
+              <td>They sell six-figure implementations to enterprises. Your market cannot buy them and they will never come down-market. But study PROS/Vendavo's <em>positioning language</em> — "price optimisation", "margin leakage", "win-rate lift" — because it is the vocabulary you're growing into.</td>
+            </tr>
+            <tr>
+              <td class="tight"><strong>Nothing / status quo</strong></td>
+              <td>The owner who says "my team manages fine"</td>
+              <td>Costs nothing, changes nothing</td>
+              <td>Your real fight. Beat it with a number from a real customer, not a feature list.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <p><strong>Where this leaves you:</strong> the honest positioning is "CPQ intelligence, priced for an Indian SME, that sits upstream of Tally". Nobody credible occupies that square today. It is narrow enough to win and broad enough to build a real business on — which is exactly what a first product should be.</p>
+      </div>
+    </section>
+
+    <!-- ============ 09 ============ -->
+    <section id="pricing">
+      <span class="kicker">09 — Money</span>
+      <h2>Pricing and packaging</h2>
+
+      <p>Your existing pitch deck already proposes three tiers at ₹2,999 / ₹6,999 / ₹14,999 per month. The structure is sound and the market read behind it is good. Four adjustments.</p>
+
+      <h3>9.1 Fix the pricing metric</h3>
+      <p>Flat-tier pricing with seat caps means a two-person firm and a seven-person firm pay the same ₹6,999, and you have no expansion revenue as a customer grows. That kills net revenue retention, which is the number that makes a SaaS worth anything. Move to <strong>a small platform fee plus per-seat</strong>: e.g. ₹1,999/month base (includes 2 seats) + ₹899/seat/month, annual prepay at 2 months free. Now growth inside an account grows your revenue automatically.</p>
+
+      <h3>9.2 Meter the AI, don't give it away</h3>
+      <p>Vision extraction has a real marginal cost, and it's the feature people will hammer. Include a generous monthly page allowance per plan (say 200 / 1,000 / unlimited-fair-use) and sell top-ups. This also gives you a usage signal that predicts both expansion and churn.</p>
+
+      <h3>9.3 Gate on value, not on arbitrary limits</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Tier</th><th>Who</th><th>Gate</th><th>Price direction</th></tr></thead>
+          <tbody>
+            <tr><td class="tight"><strong>Starter</strong></td><td>1–3 person trading firm</td><td>Quoting, PDF, basic history, 200 AI pages</td><td class="num">~₹1,999 + ₹899/seat</td></tr>
+            <tr><td class="tight"><strong>Growth</strong></td><td>4–10 salespeople, an owner who wants control</td><td>+ Role-based cost hiding, approval workflow, full analytics, Tally export, 1,000 AI pages</td><td class="num">~₹4,999 + ₹899/seat</td></tr>
+            <tr><td class="tight"><strong>Enterprise</strong></td><td>Multi-branch, 10+ users</td><td>+ Multi-branch scoping, SSO, audit export, dedicated onboarding, SLA</td><td class="num">Quoted, ~₹15k+</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Note what's gated: <em>cost-price hiding and approval workflow</em> are the Growth gate, because those are the owner-control features an owner will happily pay to unlock. Never gate the pricing intelligence itself — that's the reason they came.</p>
+
+      <h3>9.4 Keep the paid-pilot instinct</h3>
+      <p>The deck's advice to sell a paid pilot rather than a free trial is right for direct sales to Indian SMEs — payment creates the commitment that gets the data imported and the team trained. Run both motions: a self-serve 14-day trial for inbound signups, and a ₹4,999 paid onboarding pilot (credited to the first invoice) for anyone you sell to directly. The pilot fee buys them your time doing the historical data import, which is precisely the step that makes the product work.</p>
+
+      <div class="callout">
+        <p><strong>One caution about the ROI table in your existing deck.</strong> The "+₹90,000/month impact" numbers are constructed, not measured. Used as-is with a sharp buyer, they damage credibility. Replace them with one real number from your friend's company — quotes per month, hours saved, a specific deal recovered — even if it's smaller. One verified number beats a page of modelled ones. Get this before that relationship goes cold; it's the only case study you currently have access to.</p>
+      </div>
+    </section>
+
+    <!-- ============ 10 ============ -->
+    <section id="gtm">
+      <span class="kicker">10 — Go to market</span>
+      <h2>How to market this software</h2>
+
+      <h3>10.1 Positioning statement</h3>
+      <div class="pull">For Indian industrial trading and manufacturing firms whose salespeople quote from spreadsheets and memory, QuoteFlow is the quoting layer that remembers every price you've ever quoted — so your team quotes in minutes, at the price that actually wins, and no deal goes cold. It works alongside Tally; it doesn't replace it.</div>
+
+      <h3>10.2 Pick a narrower beachhead than the deck does</h3>
+      <p>The pitch deck lists ten industries. Ten industries means ten sets of vocabulary, ten sets of objections, and no word of mouth in any of them. Pick <strong>one vertical in one cluster</strong> — the obvious choice is industrial rubber/sealing/gaskets, because you have a reference customer and the domain vocabulary already, in a cluster like Ludhiana, Rajkot, Coimbatore or Pune. Win fifteen firms in one cluster and the sixteenth calls you. Then port the playbook to the adjacent vertical.</p>
+
+      <h3>10.3 The message hierarchy</h3>
+      <ul>
+        <li><strong>Hook (10 seconds):</strong> the WhatsApp photo becoming a filled quote. Show it, don't describe it. This is your entire top of funnel — it is visual, instantly legible, and it is the thing people forward to a friend.</li>
+        <li><strong>Hold (2 minutes):</strong> price history. "Last time you quoted this client ₹480 you won; at ₹520 you lost." Owners physically lean in at this.</li>
+        <li><strong>Close (the owner's real fear):</strong> "When your senior salesperson leaves, his pricing knowledge stays in your system." In family-run Indian trading firms, this is the most powerful sentence in your deck. Lead with it when you're selling to the owner rather than the sales head.</li>
+      </ul>
+
+      <h3>10.4 Channels, ranked by expected return</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Channel</th><th>Why</th><th>First action</th></tr></thead>
+          <tbody>
+            <tr><td class="tight"><strong>1. Tally partners &amp; resellers</strong></td><td>They already sell software to exactly your ICP, monthly, in person. Highest-leverage channel available to you.</td><td>Sign 3 partners in your chosen cluster with 25% recurring commission and a 30-minute demo script.</td></tr>
+            <tr><td class="tight"><strong>2. Industry associations &amp; clusters</strong></td><td>MSME clusters, trade bodies, FIEO/CII chapters. Tight networks; word of mouth travels in weeks.</td><td>Sponsor one association event; offer members a group discount.</td></tr>
+            <tr><td class="tight"><strong>3. Founder-led direct outreach</strong></td><td>Your first 20 customers should come from you personally. It's also the only way to learn the objections.</td><td>50 LinkedIn/phone touches a week to owners and sales heads; demo within 24 hours of interest.</td></tr>
+            <tr><td class="tight"><strong>4. Short video (WhatsApp / YouTube / Instagram Reels)</strong></td><td>The OCR demo is inherently viral in a way that most B2B software isn't. Vernacular versions massively outperform English in Tier 2/3.</td><td>One 45-second clip: requirement photo → finished quote. Hindi and Gujarati cuts.</td></tr>
+            <tr><td class="tight"><strong>5. CA and consultant referrals</strong></td><td>CAs see the chaos, are trusted, and have a portfolio of SME clients.</td><td>Referral fee or free seat; a one-page explainer they can forward.</td></tr>
+            <tr><td class="tight"><strong>6. SEO / comparison content</strong></td><td>Slow, compounding. "quotation software for traders", "alternative to Excel quotations", "quotation format with GST".</td><td>Free GST quotation-format template as a lead magnet — high intent, trivially cheap.</td></tr>
+            <tr><td class="tight"><strong>7. Paid ads</strong></td><td>Last resort. This buyer doesn't search for a category that doesn't exist yet.</td><td>Don't, until you can quote CAC payback from the channels above.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>10.5 The sales motion</h3>
+      <ol class="body-list">
+        <li><strong>Demo with their data, not yours.</strong> Ask for one requirement sheet photo before the call and have their real products on screen. Conversion roughly doubles versus a generic demo — this is the single highest-return thing in the whole motion.</li>
+        <li><strong>Demo to the owner, not just the sales head.</strong> The sales head sees a tool that monitors him. The owner sees institutional memory he currently doesn't own.</li>
+        <li><strong>Close on the paid pilot,</strong> which includes you importing their last 12 months of quotes. That import is what makes the product visibly work in week one instead of month three.</li>
+        <li><strong>Define activation and chase it:</strong> an org is activated when it has 10 saved quotes and 2 active users. Everything in onboarding should aim at that; measure it weekly.</li>
+        <li><strong>Ask for the referral at the first "wow",</strong> not at renewal. In cluster markets that's how the second customer happens.</li>
+      </ol>
+
+      <h3>10.6 Objections you'll actually hear</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Objection</th><th>Answer</th></tr></thead>
+          <tbody>
+            <tr><td class="tight">"We have Tally."</td><td>"Keep it. Tally starts at the order. We're everything before that — and we hand the won quote to Tally."</td></tr>
+            <tr><td class="tight">"Our data is too sensitive for cloud."</td><td>A security page, encryption at rest and in transit, role-based cost hiding, a one-click full export, and a named person accountable. Then: "your cost prices are currently in a WhatsApp group and three laptops."</td></tr>
+            <tr><td class="tight">"My team won't use it."</td><td>Don't argue — do the import for them and train in one 90-minute session. Adoption is your job, not theirs. Track the activation metric and intervene at day 7.</td></tr>
+            <tr><td class="tight">"Too expensive."</td><td>Reframe per-quote: "₹5,000 a month across 80 quotes is ₹62 a quote. One recovered deal covers the year." Never discount the list price — discount the term (annual prepay).</td></tr>
+            <tr><td class="tight">"Can you add [X] for us?"</td><td>The internal-tool trap. "Not as custom work. Tell me the problem — if three customers have it, it's on the roadmap."</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 11 ============ -->
+    <section id="metrics">
+      <span class="kicker">11 — Instrumentation</span>
+      <h2>The numbers that tell you if it's working</h2>
+
+      <p>Instrument these from day one — retrofitting analytics after you have customers means a year of blind quarters.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Metric</th><th>Definition for QuoteFlow</th><th>Healthy signal</th></tr></thead>
+          <tbody>
+            <tr><td class="tight">Time to first quote</td><td>Signup → first saved quotation</td><td class="num">&lt; 30 minutes</td></tr>
+            <tr><td class="tight">Activation rate</td><td>Orgs reaching 10 quotes + 2 users in 14 days</td><td class="num">&gt; 40%</td></tr>
+            <tr><td class="tight">Weekly active quoting</td><td>Orgs saving ≥ 3 quotes/week</td><td>The real retention metric — not logins</td></tr>
+            <tr><td class="tight">History-panel usage</td><td>% of saved items where price history was opened</td><td>Proves the differentiator is being used, not just shipped</td></tr>
+            <tr><td class="tight">Logo churn</td><td>Monthly cancelled orgs</td><td class="num">&lt; 2%/month</td></tr>
+            <tr><td class="tight">Net revenue retention</td><td>Expansion from seats and AI top-ups minus churn</td><td class="num">&gt; 100%</td></tr>
+            <tr><td class="tight">CAC payback</td><td>Fully loaded acquisition cost ÷ monthly gross margin</td><td class="num">&lt; 12 months</td></tr>
+            <tr><td class="tight">AI cost per org</td><td>Vision spend ÷ subscription revenue</td><td class="num">&lt; 10% of revenue</td></tr>
+            <tr><td class="tight">Support load</td><td>Tickets per org per month</td><td>Rising = an onboarding or UX defect, not a staffing problem</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 12 ============ -->
+    <section id="decisions">
+      <span class="kicker">12 — Open questions</span>
+      <h2>Decisions only you can make</h2>
+
+      <p>None of the work above should start until these are settled, because each one changes the plan materially.</p>
+      <ol class="body-list">
+        <li><strong>Rebuild or extract?</strong> My recommendation: keep the repo, keep the UI, rewrite the data layer and auth in place. The React surface is the valuable part and it is genuinely decent. A greenfield rewrite loses six months for a cleaner <code>git log</code>.</li>
+        <li><strong>Are you the developer, or hiring one?</strong> Phase 1 is unglamorous infrastructure work. If you're doing it alone alongside a job, double every estimate and cut Phase 3 entirely from the v1 plan.</li>
+        <li><strong>Can you get the case study?</strong> Your friend's company stopped using it. Before that relationship goes cold, get: quotes per month, hours saved, one specific deal the system saved, and permission to use the name. Also ask the harder question — <em>why</em> did they stop? That answer is the most valuable market research available to you, and it likely names your first retention problem.</li>
+        <li><strong>Which vertical, which cluster?</strong> One of each. Write it down before building, because it determines the import formats, the vocabulary, and the PDF template.</li>
+        <li><strong>Do you have a channel relationship?</strong> If you can sign two Tally partners before writing code, the whole plan de-risks. If you can't, the direct motion needs to be sharper and the timeline is longer.</li>
+        <li><strong>What's the funding envelope?</strong> Roughly ₹1–2 lakh/month covers infrastructure, AI, tools and legal at low volume. Fourteen weeks of work plus six months of runway to first revenue is the honest ask.</li>
+      </ol>
+
+      <hr />
+      <p class="footnote">This document reads the codebase as of commit <code>5ab9e59</code> on <code>master</code>. Section 07's Tally details and section 09's price points should be re-verified against current public information before they go into any customer-facing material. No code was modified in producing this analysis.</p>
+    </section>
+
+  </main>
+</div>

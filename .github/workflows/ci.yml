@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      # Blocking: the pricing maths and status derivation must stay correct.
+      - name: Unit tests
+        run: npm test
+
+      # Blocking: a broken build must never reach master.
+      - name: Production build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_ANON_KEY: ci-placeholder-key
+
+      # Blocking: the backlog is cleared and lint passes with zero problems.
+      # Keep it that way — a warning-tolerant gate is not a gate.
+      - name: Lint
+        run: npm run lint
+
+      # A build must never contain a secret. This fails loudly if one appears.
+      - name: Check bundle for leaked secrets
+        run: |
+          if grep -rEq "sk-[A-Za-z0-9_-]{20,}|service_role" dist/assets/*.js; then
+            echo "::error::A secret appears to be present in the production bundle"
+            exit 1
+          fi
+          echo "No secrets found in bundle."

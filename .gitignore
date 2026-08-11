@@ -11,7 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Every env file except the committed template
 .env
+.env.*
+!.env.example
 
 # Claude Code project settings (may contain tokens)
 .claude/
